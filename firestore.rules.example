@@ -3,7 +3,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     /**
      * 将 YOUR_SYNC_TOKEN 替换为后台「云同步」里保存的「同步文档 ID」（与 localStorage 中 cloudSyncToken 一致）。
-     * 仅该文档可被读写，降低被扫库篡改的风险（仍需保管好文档 ID，勿提交到公开仓库）。
+     * 若使用 sync-public-config.js 让访客自动拉取，其中的 syncDocId 须与本处一致；知悉该 ID 的客户端可按规则读写该文档，请使用足够长的随机 ID。
      */
     match /wilsonSiteSync/{docId} {
       allow read, write: if docId == "YOUR_SYNC_TOKEN";

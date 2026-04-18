@@ -822,6 +822,7 @@
                     在 Firebase 创建项目并启用 Firestore 后，将 Web 应用配置粘贴到下方；各台电脑使用相同的「同步文档 ID」并在控制台粘贴
                     <code style="font-size: 12px;">firestore.rules.example</code>
                     中的规则（把 YOUR_SYNC_TOKEN 换成你的文档 ID）。开启后：打开本站会先拉取云端；管理员保存编辑、新闻、图片、对话等会自动上传；多台电脑可实时收到更新。
+                    <strong>普通访客自动读云端：</strong>在项目里的 <code style="font-size: 12px;">sync-public-config.js</code> 中填入相同的 <code style="font-size: 12px;">firebaseConfig</code> 与 <code style="font-size: 12px;">syncDocId</code>（勿为 null）后重新部署；未登录用户打开首页也会拉取并展示云端内容。可参考 <code style="font-size: 12px;">sync-public-config.example.js</code>。
                 </p>
             </div>
             <div class="admin-sync-form" style="max-width: 40rem;">
@@ -978,6 +979,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="sync-public-config.js"></script>
     <script src="cloud-sync.js"></script>
     <script src="site-images.js"></script>
     <script src="script.js"></script>

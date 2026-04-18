@@ -67,9 +67,40 @@
         return { enabled: enabled, cfg: cfg, token: token };
     }
 
+    /**
+     * 仅读 window.__WILSON_PUBLIC_CLOUD_SYNC__（sync-public-config.js），供未配置 localStorage 的访客拉取。
+     */
+    function readPublicCloudSync() {
+        var p = global.__WILSON_PUBLIC_CLOUD_SYNC__;
+        if (!p || typeof p !== 'object') {
+            return { cfg: null, token: '' };
+        }
+        var tok = (p.syncDocId || '').trim();
+        var cfg = p.firebaseConfig;
+        if (!cfg || typeof cfg !== 'object' || !cfg.apiKey) {
+            return { cfg: null, token: tok };
+        }
+        return { cfg: cfg, token: tok };
+    }
+
+    /**
+     * 管理员已启用且配置完整时优先用 localStorage；否则若 sync-public-config.js 已填写则用公开配置（访客也可拉取）。
+     */
+    function getEffectiveConfig() {
+        var ls = readConfig();
+        if (ls.enabled && ls.cfg && ls.token) {
+            return { cfg: ls.cfg, token: ls.token, source: 'local' };
+        }
+        var pub = readPublicCloudSync();
+        if (pub.cfg && pub.token) {
+            return { cfg: pub.cfg, token: pub.token, source: 'public' };
+        }
+        return null;
+    }
+
     function getFirestoreRefs() {
-        var c = readConfig();
-        if (!c.enabled || !c.cfg || !c.token) {
+        var c = getEffectiveConfig();
+        if (!c || !c.cfg || !c.token) {
             return null;
         }
         if (!global.firebase || !firebase.firestore) {
@@ -81,7 +112,8 @@
         var db = firebase.firestore();
         return {
             db: db,
-            docRef: db.collection(COLLECTION).doc(c.token)
+            docRef: db.collection(COLLECTION).doc(c.token),
+            source: c.source
         };
     }
 
@@ -137,6 +169,9 @@
         if (localStorage.getItem('adminLoggedIn') !== 'true') {
             return Promise.resolve();
         }
+        if (!getEffectiveConfig()) {
+            return Promise.resolve();
+        }
         var refs = getFirestoreRefs();
         if (!refs) {
             return Promise.resolve();
@@ -173,7 +208,7 @@
         if (localStorage.getItem('adminLoggedIn') !== 'true') {
             return;
         }
-        if (!readConfig().enabled) {
+        if (!getEffectiveConfig()) {
             return;
         }
         clearTimeout(pushTimer);
