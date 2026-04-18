@@ -74,6 +74,9 @@ function initAdmin() {
     
     // 对话系统
     initChatSystem();
+
+    // 云同步设置
+    initCloudSyncPanel();
     
     // 根据用户类型显示/隐藏历史记录标签
     updateAdminTabs();
@@ -169,6 +172,9 @@ function handleLogin() {
         localStorage.setItem('userType', 'superadmin');
         hideAdminLogin();
         checkAdminLogin();
+        if (typeof window.wilsonCloudSyncStartListener === 'function') {
+            window.wilsonCloudSyncStartListener();
+        }
         switchToAdminPage();
         return;
     }
@@ -181,6 +187,9 @@ function handleLogin() {
         localStorage.setItem('userType', 'admin');
         hideAdminLogin();
         checkAdminLogin();
+        if (typeof window.wilsonCloudSyncStartListener === 'function') {
+            window.wilsonCloudSyncStartListener();
+        }
         switchToAdminPage();
     } else {
         // 登录失败
@@ -206,6 +215,9 @@ function showMainContentAfterAdmin() {
  * 退出登录
  */
 function logout() {
+    if (typeof window.wilsonCloudSyncStopListener === 'function') {
+        window.wilsonCloudSyncStopListener();
+    }
     localStorage.setItem('adminLoggedIn', 'false');
     checkAdminLogin();
     
@@ -298,6 +310,9 @@ function initAdminTabs() {
                     content.classList.add('active');
                     // 渲染聊天消息
                     renderChatMessages();
+                } else if (targetTab === 'sync' && contentId === 'adminSyncTab') {
+                    content.classList.add('active');
+                    refreshCloudSyncForm();
                 }
             });
         });
@@ -406,6 +421,9 @@ function saveNewsToStorage(news) {
     // 触发新闻更新事件
     if (typeof window.updateNewsDisplay === 'function') {
         window.updateNewsDisplay();
+    }
+    if (typeof window.wilsonScheduleCloudSyncPush === 'function') {
+        window.wilsonScheduleCloudSyncPush();
     }
 }
 
@@ -711,6 +729,9 @@ function getCurrentState() {
  */
 function saveGlobalHistory() {
     localStorage.setItem('globalHistory', JSON.stringify(globalHistory));
+    if (typeof window.wilsonScheduleCloudSyncPush === 'function') {
+        window.wilsonScheduleCloudSyncPush();
+    }
 }
 
 /**
@@ -940,6 +961,9 @@ function escapeHtml(text) {
  */
 function saveChatMessages() {
     localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
+    if (typeof window.wilsonScheduleCloudSyncPush === 'function') {
+        window.wilsonScheduleCloudSyncPush();
+    }
 }
 
 /**
@@ -951,6 +975,128 @@ function loadChatMessages() {
         chatMessages = JSON.parse(stored);
     } else {
         chatMessages = [];
+    }
+}
+
+/**
+ * 云同步写入 globalHistory 后刷新内存中的历史列表（供 cloud-sync 调用）
+ */
+window.wilsonRefreshAdminHistoryFromStorage = function () {
+    loadGlobalHistory();
+    if (currentUserType === 'superadmin' && typeof loadHistoryList === 'function') {
+        loadHistoryList();
+    }
+};
+
+function setCloudSyncStatus(text, isError) {
+    const el = document.getElementById('cloudSyncStatus');
+    if (!el) return;
+    el.textContent = text || '';
+    el.style.color = isError ? '#c0392b' : 'var(--text-secondary)';
+}
+
+function refreshCloudSyncForm() {
+    const en = document.getElementById('cloudSyncEnabled');
+    const tok = document.getElementById('cloudSyncToken');
+    const cfg = document.getElementById('cloudSyncFirebaseConfig');
+    if (en) en.checked = localStorage.getItem('cloudSyncEnabled') === 'true';
+    if (tok) tok.value = localStorage.getItem('cloudSyncToken') || '';
+    if (cfg) cfg.value = localStorage.getItem('cloudSyncFirebaseConfig') || '';
+}
+
+function initCloudSyncPanel() {
+    const genBtn = document.getElementById('cloudSyncGenToken');
+    const saveBtn = document.getElementById('cloudSyncSaveSettings');
+    const pushBtn = document.getElementById('cloudSyncPushNow');
+    const pullBtn = document.getElementById('cloudSyncPullNow');
+
+    if (genBtn) {
+        genBtn.addEventListener('click', function () {
+            const arr = new Uint8Array(24);
+            crypto.getRandomValues(arr);
+            const id = Array.from(arr, function (b) {
+                return ('0' + b.toString(16)).slice(-2);
+            }).join('');
+            const input = document.getElementById('cloudSyncToken');
+            if (input) input.value = id;
+            setCloudSyncStatus('已生成新 ID，请保存设置并在 Firebase 规则中替换 YOUR_SYNC_TOKEN。', false);
+        });
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener('click', function () {
+            const enabled = document.getElementById('cloudSyncEnabled');
+            const token = (document.getElementById('cloudSyncToken') || {}).value || '';
+            const raw = (document.getElementById('cloudSyncFirebaseConfig') || {}).value || '';
+            if (enabled && enabled.checked) {
+                if (!token.trim()) {
+                    setCloudSyncStatus('请填写同步文档 ID。', true);
+                    return;
+                }
+                if (!raw.trim()) {
+                    setCloudSyncStatus('请粘贴 Firebase Web 配置 JSON。', true);
+                    return;
+                }
+                try {
+                    JSON.parse(raw);
+                } catch (e) {
+                    setCloudSyncStatus('Firebase 配置不是合法 JSON。', true);
+                    return;
+                }
+            }
+            localStorage.setItem('cloudSyncEnabled', enabled && enabled.checked ? 'true' : 'false');
+            localStorage.setItem('cloudSyncToken', token.trim());
+            localStorage.setItem('cloudSyncFirebaseConfig', raw.trim());
+            if (typeof window.wilsonCloudSyncStopListener === 'function') {
+                window.wilsonCloudSyncStopListener();
+            }
+            if (typeof window.wilsonCloudSyncStartListener === 'function') {
+                window.wilsonCloudSyncStartListener();
+            }
+            setCloudSyncStatus('同步设置已保存。', false);
+        });
+    }
+
+    if (pushBtn) {
+        pushBtn.addEventListener('click', function () {
+            if (localStorage.getItem('adminLoggedIn') !== 'true') {
+                setCloudSyncStatus('请先登录管理员。', true);
+                return;
+            }
+            if (typeof window.wilsonCloudSyncPushNow !== 'function') {
+                setCloudSyncStatus('云同步模块未加载。', true);
+                return;
+            }
+            setCloudSyncStatus('正在上传…', false);
+            window.wilsonCloudSyncPushNow().then(
+                function () {
+                    setCloudSyncStatus('上传成功。', false);
+                },
+                function (err) {
+                    setCloudSyncStatus('上传失败：' + (err && err.message ? err.message : String(err)), true);
+                }
+            );
+        });
+    }
+
+    if (pullBtn) {
+        pullBtn.addEventListener('click', function () {
+            if (typeof window.wilsonCloudSyncPullNow !== 'function') {
+                setCloudSyncStatus('云同步模块未加载。', true);
+                return;
+            }
+            setCloudSyncStatus('正在拉取…', false);
+            window.wilsonCloudSyncPullNow().then(
+                function (changed) {
+                    if (!changed) {
+                        setCloudSyncStatus('已是最新，或云端尚无数据。', false);
+                    }
+                },
+                function (err) {
+                    setCloudSyncStatus('拉取失败：' + (err && err.message ? err.message : String(err)), true);
+                }
+            );
+        });
     }
 }
 

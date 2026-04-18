@@ -1457,6 +1457,9 @@ function serializeAllPagesToStorage() {
         alert('保存失败：数据体积可能超过浏览器限制。请删除部分贴图或缩小图片后再试。');
         throw e;
     }
+    if (typeof window.wilsonScheduleCloudSyncPush === 'function') {
+        window.wilsonScheduleCloudSyncPush();
+    }
 }
 
 /**

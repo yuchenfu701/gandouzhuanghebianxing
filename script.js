@@ -3,12 +3,19 @@
    ============================================ */
 
 // 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    if (typeof window.__wilsonCloudSyncPull === 'function') {
+        try {
+            await window.__wilsonCloudSyncPull();
+        } catch (ePull) {
+            console.warn('云同步拉取未完成', ePull);
+        }
+    }
     initAmbientBackground();
     initAmbientClickRipples();
     initInteractiveCardTilt();
     mergeLegacyInfoContentIntoIntro();
-    // 先恢复保存的页面内容
+    // 先恢复保存的页面内容（云同步拉取后会写入 localStorage）
     restoreSavedPages();
     if (typeof applyAllSiteImagesFromStorage === 'function') {
         applyAllSiteImagesFromStorage();
@@ -25,6 +32,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (typeof applyAllSiteImagesFromStorage === 'function') {
         applyAllSiteImagesFromStorage();
+    }
+
+    if (typeof window.wilsonCloudSyncStartListener === 'function') {
+        window.wilsonCloudSyncStartListener();
     }
 });
 

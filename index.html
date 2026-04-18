@@ -772,6 +772,7 @@
             <button class="admin-tab" data-tab="content">内容管理</button>
             <button class="admin-tab" data-tab="history" id="historyTab" style="display: none;">历史记录</button>
             <button class="admin-tab" data-tab="chat" id="chatTab">对话窗口</button>
+            <button class="admin-tab" data-tab="sync" id="syncTab">云同步</button>
         </div>
 
         <!-- 新闻管理标签页 -->
@@ -810,6 +811,38 @@
             </div>
             <div id="historyList" class="history-list">
                 <!-- 历史记录列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 云同步（Firebase Firestore，跨电脑同步管理员数据与对话） -->
+        <div id="adminSyncTab" class="admin-tab-content">
+            <div class="admin-section-header admin-sync-header">
+                <h2>云同步</h2>
+                <p class="admin-sync-intro">
+                    在 Firebase 创建项目并启用 Firestore 后，将 Web 应用配置粘贴到下方；各台电脑使用相同的「同步文档 ID」并在控制台粘贴
+                    <code style="font-size: 12px;">firestore.rules.example</code>
+                    中的规则（把 YOUR_SYNC_TOKEN 换成你的文档 ID）。开启后：打开本站会先拉取云端；管理员保存编辑、新闻、图片、对话等会自动上传；多台电脑可实时收到更新。
+                </p>
+            </div>
+            <div class="admin-sync-form" style="max-width: 40rem;">
+                <div class="form-group">
+                    <label><input type="checkbox" id="cloudSyncEnabled"> 启用云同步</label>
+                </div>
+                <div class="form-group">
+                    <label for="cloudSyncToken">同步文档 ID（勿泄露；建议 24 位以上随机字符）</label>
+                    <input type="text" id="cloudSyncToken" class="admin-sync-token-input" autocomplete="off" placeholder="例如点击「生成随机 ID」">
+                    <button type="button" class="btn-secondary" id="cloudSyncGenToken" style="margin-top: 8px;">生成随机 ID</button>
+                </div>
+                <div class="form-group">
+                    <label for="cloudSyncFirebaseConfig">Firebase 配置（JSON，来自项目设置 → 您的应用）</label>
+                    <textarea id="cloudSyncFirebaseConfig" rows="8" class="admin-sync-json" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}'></textarea>
+                </div>
+                <div class="form-actions" style="flex-wrap: wrap; gap: 8px;">
+                    <button type="button" class="btn-primary" id="cloudSyncSaveSettings">保存同步设置</button>
+                    <button type="button" class="btn-secondary" id="cloudSyncPushNow">立即上传到云端</button>
+                    <button type="button" class="btn-secondary" id="cloudSyncPullNow">立即从云端拉取</button>
+                </div>
+                <p id="cloudSyncStatus" class="admin-sync-status" style="margin-top: 12px; font-size: 14px; color: var(--text-secondary);"></p>
             </div>
         </div>
 
@@ -943,6 +976,9 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="cloud-sync.js"></script>
     <script src="site-images.js"></script>
     <script src="script.js"></script>
     <script src="admin.js"></script>

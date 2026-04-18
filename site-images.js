@@ -177,6 +177,9 @@ function rememberOriginalSiteImageSrc(key, src) {
     if (!m[key]) {
         m[key] = src;
         localStorage.setItem(SITE_IMAGE_ORIGINAL_SRC_KEY, JSON.stringify(m));
+        if (typeof window.wilsonScheduleCloudSyncPush === 'function') {
+            window.wilsonScheduleCloudSyncPush();
+        }
     }
 }
 
@@ -229,6 +232,9 @@ function setSiteImageOverride(key, url) {
         console.error('保存图片覆盖失败:', e);
         alert('浏览器存储空间不足，无法保存图片。请尝试缩小图片或使用更短的内容。');
         throw e;
+    }
+    if (typeof window.wilsonScheduleCloudSyncPush === 'function') {
+        window.wilsonScheduleCloudSyncPush();
     }
     applySiteImageToDom(key, url || getSiteImageUrl(key));
 }
@@ -320,6 +326,9 @@ function syncDomImagesToOverridesFromDom() {
     } catch (e) {
         console.error('写入 siteImageOverrides 失败（可能超出存储配额）:', e);
         throw e;
+    }
+    if (typeof window.wilsonScheduleCloudSyncPush === 'function') {
+        window.wilsonScheduleCloudSyncPush();
     }
 }
 

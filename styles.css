@@ -2355,6 +2355,33 @@ body.admin-image-pick-mode #mainContent .site-visual:hover {
     font-weight: 600;
 }
 
+.admin-sync-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.admin-sync-intro {
+    color: var(--text-secondary);
+    font-size: 14px;
+    max-width: 52rem;
+    margin: 0;
+    line-height: 1.55;
+}
+
+.admin-sync-json {
+    width: 100%;
+    max-width: 40rem;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.admin-sync-token-input {
+    width: 100%;
+    max-width: 40rem;
+}
+
 .admin-list {
     display: grid;
     gap: 20px;
