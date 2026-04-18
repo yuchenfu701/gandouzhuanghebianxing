@@ -112,8 +112,7 @@
         var db = firebase.firestore();
         return {
             db: db,
-            docRef: db.collection(COLLECTION).doc(c.token),
-            source: c.source
+            docRef: db.collection(COLLECTION).doc(c.token)
         };
     }
 
