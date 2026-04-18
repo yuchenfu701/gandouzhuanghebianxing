@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肝豆状核变性患者信息平台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="ambientBg" class="ambient-bg" aria-hidden="true">
+        <div class="ambient-bg-parallax">
+            <div class="ambient-bg-drift"></div>
+        </div>
+    </div>
+    <div id="ambientFx" class="ambient-fx" aria-hidden="true"></div>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-item active" data-page="home">主页</a>
+            <a href="#" class="nav-item" data-page="intro">简介</a>
+            <a href="#" class="nav-item" data-page="news">新闻</a>
+            <a href="#" class="nav-item" data-page="research">医学研究</a>
+            <a href="#" class="nav-item" data-page="member">支持我们</a>
+            <a href="#" class="nav-item admin-btn" id="adminBtn" data-page="admin" style="display: none;">管理员</a>
+        </div>
+    </nav>
+
+    <!-- 可视化编辑工具栏（类 PPT 功能区） -->
+    <div id="editToolbar" class="edit-toolbar ppt-ribbon" style="display: none;" role="toolbar" aria-label="页面编辑">
+        <div class="ppt-ribbon-inner">
+            <div class="ppt-ribbon-group">
+                <span class="ppt-ribbon-group-label">开始</span>
+                <div class="toolbar-group ppt-ribbon-btns">
+                    <button type="button" class="toolbar-btn active" id="toolSelect" title="选择对象（单击选中，双击进入文字编辑）">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3l7 14 2-5 5-2L3 3z" fill="currentColor"/>
+                        </svg>
+                        <span>选择</span>
+                    </button>
+                    <button type="button" class="toolbar-btn" id="toolDrag" title="拖拽移动板块">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="5" cy="5" r="1.5" fill="currentColor"/>
+                            <circle cx="15" cy="5" r="1.5" fill="currentColor"/>
+                            <circle cx="5" cy="10" r="1.5" fill="currentColor"/>
+                            <circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+                            <circle cx="5" cy="15" r="1.5" fill="currentColor"/>
+                            <circle cx="15" cy="15" r="1.5" fill="currentColor"/>
+                        </svg>
+                        <span>移动</span>
+                    </button>
+                    <button type="button" class="toolbar-btn" id="toolEdit" title="编辑文字">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 2 16 L 2 18 L 4 18 L 14 8 L 12 6 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M 12 6 L 14 8" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        <span>文字</span>
+                    </button>
+                </div>
+            </div>
+            <div class="ppt-ribbon-group">
+                <span class="ppt-ribbon-group-label">插入</span>
+                <div class="toolbar-group ppt-ribbon-btns">
+                    <button type="button" class="toolbar-btn" id="toolAdd" title="新增板块">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 10 4 L 10 16 M 4 10 L 16 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span>板块</span>
+                    </button>
+                    <button type="button" class="toolbar-btn" id="toolImage" title="插入图片">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="5" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                            <circle cx="7" cy="8" r="1.5" fill="currentColor"/>
+                            <path d="M 3 15 L 8 10 L 12 14 L 17 9" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                        </svg>
+                        <span>图片</span>
+                    </button>
+                    <button type="button" class="toolbar-btn" id="toolSection" title="划分大板块">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="2" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                            <line x1="2" y1="10" x2="18" y2="10" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        <span>分区</span>
+                    </button>
+                </div>
+            </div>
+            <div class="ppt-ribbon-group">
+                <span class="ppt-ribbon-group-label">格式</span>
+                <div class="toolbar-group ppt-ribbon-btns">
+                    <button type="button" class="toolbar-btn" id="toolColor" title="文字颜色">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 10 3 L 13 10 L 10 17 L 7 10 Z" fill="currentColor"/>
+                            <circle cx="10" cy="10" r="2" fill="white"/>
+                        </svg>
+                        <span>颜色</span>
+                    </button>
+                    <button type="button" class="toolbar-btn" id="toolDraw" title="自由绘制">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 3 15 Q 5 10 8 12 Q 11 14 14 10 Q 17 6 17 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <span>绘制</span>
+                    </button>
+                    <button type="button" class="toolbar-btn" id="toolAdminImage" title="全局替换图片" style="display: none;">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="3" width="16" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                            <circle cx="7" cy="8" r="2" fill="currentColor"/>
+                            <path d="M2 14l5-4 4 3 7-6v7H2z" fill="currentColor" opacity="0.35"/>
+                        </svg>
+                        <span>换图</span>
+                    </button>
+                </div>
+            </div>
+            <div class="ppt-ribbon-group ppt-ribbon-group--end">
+                <span class="ppt-ribbon-group-label">编辑</span>
+                <div class="toolbar-group ppt-ribbon-btns">
+                    <button type="button" class="toolbar-btn" id="toolUndo" title="撤销（Ctrl+Z）">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 5 10 L 10 5 L 10 8 L 15 8 L 15 12 L 10 12 L 10 15 Z" fill="currentColor"/>
+                        </svg>
+                        <span>撤销</span>
+                    </button>
+                    <button type="button" class="toolbar-btn" id="toolReset" title="重置布局">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 10 3 L 10 7 M 10 13 L 10 17 M 3 10 L 7 10 M 13 10 L 17 10 M 5.5 5.5 L 8 8 M 12 8 L 14.5 5.5 M 14.5 14.5 L 12 12 M 8 12 L 5.5 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <span>重置</span>
+                    </button>
+                    <button type="button" class="toolbar-btn toolbar-btn-danger" id="toolSave" title="保存">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 5 5 L 5 17 L 15 17 L 15 7 L 10 7 L 10 5 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                            <line x1="10" y1="5" x2="10" y2="7" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        <span>保存</span>
+                    </button>
+                    <button type="button" class="toolbar-btn" id="toolCancel" title="退出编辑">
+                        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 5 5 L 15 15 M 15 5 L 5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span>关闭</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="editToast" class="edit-toast" role="status" aria-live="polite" style="display:none;"></div>
+
+    <!-- 调色板弹窗 -->
+    <div id="colorPickerModal" class="admin-modal">
+        <div class="admin-modal-content small">
+            <span class="admin-close" id="colorPickerClose">&times;</span>
+            <h3>选择颜色</h3>
+            <div class="color-picker">
+                <input type="color" id="colorInput" value="#4caf50">
+                <div class="color-presets">
+                    <div class="color-preset" data-color="#4caf50" style="background: #4caf50;"></div>
+                    <div class="color-preset" data-color="#ff5722" style="background: #ff5722;"></div>
+                    <div class="color-preset" data-color="#2196f3" style="background: #2196f3;"></div>
+                    <div class="color-preset" data-color="#ff9800" style="background: #ff9800;"></div>
+                    <div class="color-preset" data-color="#9c27b0" style="background: #9c27b0;"></div>
+                    <div class="color-preset" data-color="#00bcd4" style="background: #00bcd4;"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-primary" id="applyColor">应用</button>
+                    <button type="button" class="btn-secondary" id="cancelColor">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增板块弹窗 -->
+    <div id="addSectionModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close" id="addSectionClose">&times;</span>
+            <h2>新增板块</h2>
+            <form id="addSectionForm">
+                <div class="form-group">
+                    <label for="sectionType">板块类型：</label>
+                    <select id="sectionType" required>
+                        <option value="text">文本板块</option>
+                        <option value="image">图片板块</option>
+                        <option value="card">卡片板块</option>
+                        <option value="grid">网格板块</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sectionTitle">标题：</label>
+                    <input type="text" id="sectionTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="sectionContent">内容：</label>
+                    <textarea id="sectionContent" rows="4"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">添加</button>
+                    <button type="button" class="btn-secondary" id="cancelAddSection">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <main class="main-content" id="mainContent">
+        <!-- 首页 -->
+        <section id="home" class="page active editable-page">
+            <div class="hero-section editable-section" data-section="hero">
+                <div class="mission-box editable-content">
+                    <h1 contenteditable="false" class="editable-title">使命与欢迎语</h1>
+                    <p class="mission-text editable-text" contenteditable="false">
+                        欢迎来到肝豆状核变性患者信息平台。我们致力于为患者、家属、医疗工作者和研究者提供全面、准确的疾病信息和资源支持。
+                    </p>
+                    <p class="mission-text">
+                        我们的使命是：通过科学知识的传播，帮助更多人了解肝豆状核变性，为患者提供希望与支持，推动医学研究的进步。
+                    </p>
+                </div>
+                <div class="hero-image site-visual" data-site-image="hero">
+                    <img src="" alt="首页配图" width="400" height="300" loading="lazy">
+                </div>
+            </div>
+            
+            <div class="quick-access">
+                <h2>快速入口</h2>
+                <div class="access-grid">
+                    <div class="access-card editable-section" data-page="intro" data-section="quick-intro">
+                        <div class="card-icon">
+                            <svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="30" cy="30" r="25" fill="#81c784" opacity="0.2"/>
+                                <path d="M 30 15 L 30 30 L 45 30" stroke="#4caf50" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                <circle cx="30" cy="30" r="3" fill="#4caf50"/>
+                            </svg>
+                        </div>
+                        <h3 class="editable-title" contenteditable="false">简介</h3>
+                        <p class="editable-text" contenteditable="false">疾病知识、节日与用药、社群与实用资源，以及表现型、治疗与疾病特征</p>
+                    </div>
+                    
+                    <div class="access-card" data-page="news">
+                        <div class="card-icon">
+                            <svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="10" y="15" width="40" height="30" rx="2" fill="#81c784" opacity="0.2"/>
+                                <line x1="15" y1="25" x2="45" y2="25" stroke="#4caf50" stroke-width="2"/>
+                                <line x1="15" y1="32" x2="40" y2="32" stroke="#4caf50" stroke-width="2"/>
+                                <line x1="15" y1="39" x2="35" y2="39" stroke="#4caf50" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <h3>新闻</h3>
+                        <p>获取最新的疾病相关新闻和研究动态</p>
+                    </div>
+                    
+                    <div class="access-card" data-page="research">
+                        <div class="card-icon">
+                            <svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="15" y="20" width="30" height="25" rx="2" fill="#81c784" opacity="0.2"/>
+                                <line x1="20" y1="30" x2="40" y2="30" stroke="#4caf50" stroke-width="2"/>
+                                <line x1="20" y1="35" x2="35" y2="35" stroke="#4caf50" stroke-width="2"/>
+                                <circle cx="45" cy="32" r="3" fill="#4caf50"/>
+                            </svg>
+                        </div>
+                        <h3>医学研究</h3>
+                        <p>前沿研究成果、新药进展和预防手段</p>
+                    </div>
+                    
+                    <div class="access-card" data-page="member">
+                        <div class="card-icon">
+                            <svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="30" cy="20" r="8" fill="#81c784" opacity="0.2"/>
+                                <path d="M 15 45 Q 15 35 30 35 Q 45 35 45 45" stroke="#4caf50" stroke-width="2" fill="none"/>
+                            </svg>
+                        </div>
+                        <h3>支持我们</h3>
+                        <p>参与方式、捐赠指南、致谢名单与感谢词</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 简介页面 -->
+        <section id="intro" class="page">
+            <div class="intro-header">
+                <div class="intro-title-box">
+                    <h1>病情简介/使命</h1>
+                    <h2>与价值观</h2>
+                </div>
+                <div class="intro-image site-visual" data-site-image="introHeader">
+                    <img src="" alt="简介配图" width="400" height="300" loading="lazy">
+                </div>
+            </div>
+            
+            <div class="intro-content">
+                <div class="intro-brief">
+                    <h2>什么是肝豆状核变性？</h2>
+                    <p>
+                        肝豆状核变性（Wilson's Disease）是一种罕见的常染色体隐性遗传病，由ATP7B基因突变引起。
+                        该疾病导致铜在体内异常积累，主要影响肝脏和神经系统。
+                    </p>
+                    <p>
+                        如果不及时治疗，过量的铜会对多个器官造成损害，包括肝脏、大脑、肾脏和眼睛。
+                        早期诊断和规范治疗可以有效控制病情，改善患者生活质量。
+                    </p>
+                </div>
+                
+                <div class="intro-details">
+                    <h2>详细信息</h2>
+                    <div class="detail-section">
+                        <h3>表现型</h3>
+                        <ul>
+                            <li><strong>肝型：</strong>主要表现为肝功能异常、肝硬化、急性肝衰竭等</li>
+                            <li><strong>神经型：</strong>出现震颤、肌张力障碍、构音障碍、步态异常等神经系统症状</li>
+                            <li><strong>混合型：</strong>同时出现肝脏和神经系统症状</li>
+                            <li><strong>无症状型：</strong>早期无明显症状，通过筛查发现</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>如何治疗</h3>
+                        <ul>
+                            <li><strong>排铜治疗：</strong>使用青霉胺、曲恩汀等药物促进铜的排出</li>
+                            <li><strong>低铜饮食：</strong>限制高铜食物摄入，如贝类、坚果、巧克力等</li>
+                            <li><strong>锌剂治疗：</strong>使用锌剂阻止肠道对铜的吸收</li>
+                            <li><strong>肝移植：</strong>对于严重肝衰竭患者，可考虑肝移植</li>
+                            <li><strong>定期监测：</strong>定期检查肝功能、血铜、尿铜等指标</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>发病原理</h3>
+                        <p>
+                            肝豆状核变性是由于ATP7B基因突变，导致编码的ATP7B蛋白功能异常。
+                            正常情况下，ATP7B蛋白负责将多余的铜从肝脏排出到胆汁中。
+                            当该蛋白功能异常时，铜无法正常排出，在体内逐渐积累，最终导致器官损害。
+                        </p>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>疾病特征</h3>
+                        <ul>
+                            <li>通常在5-35岁之间发病</li>
+                            <li>家族中有类似疾病史</li>
+                            <li>角膜K-F环（Kayser-Fleischer环）是特征性体征</li>
+                            <li>血清铜蓝蛋白降低</li>
+                            <li>24小时尿铜排泄增加</li>
+                            <li>基因检测可确诊</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="intro-info-merge">
+                <h2 class="intro-info-merge-title">实用信息与资源</h2>
+                <p class="intro-info-merge-lead">以下内容原属「信息中心」，现已并入简介页，便于一站式查阅。</p>
+                <div class="info-image-large site-visual" data-site-image="infoBanner">
+                    <img src="" alt="信息横幅" width="500" height="300" loading="lazy">
+                </div>
+            </div>
+            <div class="info-content intro-info-merge">
+                <div class="info-card">
+                    <h2>肝豆状核变性的节日</h2>
+                    <p>每年的国际肝豆状核变性日，我们都会组织相关活动，提高公众对疾病的认识，为患者和家属提供支持。</p>
+                    <p><strong>日期：</strong>每年3月19日</p>
+                    <p><strong>活动内容：</strong>健康讲座、患者交流会、义诊活动等</p>
+                </div>
+                <div class="info-card">
+                    <h2>如何用药</h2>
+                    <div class="medication-guide">
+                        <h3>常用药物</h3>
+                        <ul>
+                            <li><strong>青霉胺：</strong>初始剂量需从小剂量开始，逐渐增加，注意监测副作用</li>
+                            <li><strong>曲恩汀：</strong>适用于对青霉胺不耐受的患者</li>
+                            <li><strong>锌剂：</strong>用于维持治疗，需空腹服用，避免与食物同服</li>
+                        </ul>
+                        <h3>用药注意事项</h3>
+                        <ul>
+                            <li>严格遵医嘱，不可自行停药或调整剂量</li>
+                            <li>定期复查肝功能和血铜水平</li>
+                            <li>注意观察药物不良反应</li>
+                            <li>不同药物需间隔服用时间</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h2>肝豆状核变性的社群</h2>
+                    <p>加入我们的患者社群，与其他患者和家属分享经验，获得支持和帮助。</p>
+                    <div class="community-info">
+                        <h3>社群活动</h3>
+                        <ul>
+                            <li>定期线上交流会</li>
+                            <li>患者经验分享会</li>
+                            <li>专家在线答疑</li>
+                            <li>心理支持小组</li>
+                        </ul>
+                        <h3>联系方式</h3>
+                        <p>加入社群请通过「支持我们」页面注册</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 新闻页面 -->
+        <section id="news" class="page">
+            <div class="news-header">
+                <h1>新闻动态</h1>
+                <div class="search-box">
+                    <input type="text" id="newsSearch" placeholder="搜索新闻...">
+                    <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="9" cy="9" r="6" stroke="#666" stroke-width="1.5" fill="none"/>
+                        <line x1="13" y1="13" x2="17" y2="17" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="news-grid" id="newsGrid">
+                <!-- 新闻卡片将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="other-news">
+                <h3>其他新闻和链接</h3>
+                <div class="news-links">
+                    <a href="#">更多医学新闻</a>
+                    <a href="#">相关研究机构</a>
+                    <a href="#">患者支持组织</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 医学研究页面 -->
+        <section id="research" class="page">
+            <div class="research-hero">
+                <div class="research-hero-copy">
+                    <span class="research-hero-pill">肝脏 · 铜代谢 · 罕见病</span>
+                    <h1>医学研究与前沿进展</h1>
+                    <p class="research-hero-lead">按时间梳理近年基因治疗、新药研发、指南共识与流行病学等动态，便于患者与专业人员快速把握方向。内容整理自公开报道与学术进展，仅供学习参考，不构成诊疗建议。</p>
+                </div>
+                <div class="research-hero-visual research-image site-visual" data-site-image="research">
+                    <img src="" alt="科研与实验室" width="400" height="260" loading="lazy">
+                </div>
+            </div>
+
+            <div class="research-timeline" aria-label="研究进展时间线">
+
+                <section class="research-month" aria-labelledby="research-m2026-03">
+                    <h2 id="research-m2026-03" class="research-month__label">2026年3月</h2>
+                    <div class="research-month__cards">
+                        <article class="research-card">
+                            <h3 class="research-card__title">AAV8-tATP7B 基因治疗临床前研究发表</h3>
+                            <p class="research-card__text">李武平与范建高团队于 3 月 4 日在《Clinical and Molecular Hepatology》发表研究。团队研发的基于 AAV8 载体的基因药物，在 ATP7B 基因敲除小鼠模型中能以剂量依赖性方式恢复铜稳态与肝功能，并逆转已形成的肝损伤。在食蟹猴模型中确定最大耐受剂量为 6×10<sup>13</sup> vg/kg，未观察到全身性毒性，为临床转化奠定基础。</p>
+                        </article>
+                        <article class="research-card">
+                            <h3 class="research-card__title">Trientine Tetrahydrochloride 每日一次剂型临床试验启动</h3>
+                            <p class="research-card__text">一项评估新曲恩汀（TETA 4HCl）每日一次剂型对比 D-青霉胺作为一线治疗有效性与安全性的临床试验，于 3 月 12 日更新方案。若成功，有望简化用药、改善依从性。</p>
+                        </article>
+                        <article class="research-card">
+                            <h3 class="research-card__title">UX701 基因疗法临床试验状态更新</h3>
+                            <p class="research-card__text">Ultragenyx 公司于 3 月 13 日更新 UX701 的 1/2/3 期临床试验信息：第一阶段剂量探索；第二阶段（3 期）为随机、开放标签的活性对照试验；第三阶段对给药患者进行至少 5 年长期随访，以评估安全性与疗效。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="research-month" aria-labelledby="research-m2026-01">
+                    <h2 id="research-m2026-01" class="research-month__label">2026年1月</h2>
+                    <div class="research-month__cards">
+                        <article class="research-card">
+                            <h3 class="research-card__title">LY-M003 基因疗法公布 I 期临床试验详细标准</h3>
+                            <p class="research-card__text">1 月 21 日，LY-M003 I 期试验标准公布：计划招募 10–60 岁经治稳定患者，单次静脉输注，旨在恢复肝细胞铜代谢能力。入选要求包括 ATP7B 基因双等位基因突变，并已接受标准治疗至少 6 个月。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="research-month" aria-labelledby="research-m2025-12">
+                    <h2 id="research-m2025-12" class="research-month__label">2025年12月</h2>
+                    <div class="research-month__cards">
+                        <article class="research-card">
+                            <h3 class="research-card__title">GC310 基因疗法启动 I/II 期临床试验</h3>
+                            <p class="research-card__text">12 月 26 日，锦篮基因 GC310 注射液在北京协和医院召开 I/II 期启动会。试验为全国多中心、开放、单次给药、剂量递增设计，计划招募 10–15 名成人患者，评估安全性与耐受性，标志疗法进入人体临床阶段。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="research-month" aria-labelledby="research-m2025-11">
+                    <h2 id="research-m2025-11" class="research-month__label">2025年11月</h2>
+                    <div class="research-month__cards">
+                        <article class="research-card">
+                            <h3 class="research-card__title">Prime Medicine：PM577 基因编辑疗法进展</h3>
+                            <p class="research-card__text">11 月 7 日，公司宣布拟于 2026 年上半年为 PM577 提交 IND 或 CTA，预计 2027 年获得初步临床数据；疗法针对 ATP7B H1069Q 热点突变。</p>
+                        </article>
+                        <article class="research-card">
+                            <h3 class="research-card__title">DSL101 mRNA 疗法临床试验登记</h3>
+                            <p class="research-card__text">11 月 10 日，ATP7B 信使核糖核酸/脂质纳米粒（DSL101）临床研究正式登记：单臂、开放、剂量递增的早期 I 期，计划纳入 18 名经治稳定成人患者，评估安全性、耐受性与初步疗效。</p>
+                        </article>
+                        <article class="research-card">
+                            <h3 class="research-card__title">LY-M003 获 FDA 批准直接进入临床 II 期</h3>
+                            <p class="research-card__text">11 月 18 日，凌意生物宣布 LY-M003 获美国 FDA IND 许可并获准直接进入 II 期。该疗法为全球首个采用铜离子动态调控表达技术（CREATE™）的 AAV 基因疗法，拟通过单次静脉输注恢复肝细胞铜代谢能力。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="research-month" aria-labelledby="research-m2025-10">
+                    <h2 id="research-m2025-10" class="research-month__label">2025年10月</h2>
+                    <div class="research-month__cards">
+                        <article class="research-card">
+                            <h3 class="research-card__title">Prime Medicine 公布基因编辑疗法临床前数据</h3>
+                            <p class="research-card__text">10 月 30 日 KOL 活动展示 Prime Editing 在 Wilson 病中的应用；公司重申 PM577（H1069Q）进展顺利，拟 2026 年上半年提交 IND。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="research-month" aria-labelledby="research-m2025-09">
+                    <h2 id="research-m2025-09" class="research-month__label">2025年9月</h2>
+                    <div class="research-month__cards">
+                        <article class="research-card">
+                            <h3 class="research-card__title">GC310 临床试验招募启动</h3>
+                            <p class="research-card__text">9 月 25 日，锦篮基因正式启动 GC310 注射液 I/II 期临床试验招募，推动临床进程。</p>
+                        </article>
+                        <article class="research-card">
+                            <h3 class="research-card__title">中医药干预 WD 合并生殖功能障碍机制</h3>
+                            <p class="research-card__text">9 月 5 日，安徽中医药大学第一附属医院韩辉团队等在《先进科学》发表研究：口服负载锌-姜黄素的工程化灵芝细胞外囊泡，通过离子交换调控细胞内外铜水平，修复下丘脑-垂体-睾丸轴，为 WD 合并生殖功能障碍提供新策略。</p>
+                        </article>
+                        <article class="research-card">
+                            <h3 class="research-card__title">「铜娃娃」疾病科普获关注</h3>
+                            <p class="research-card__text">9 月 19 日，《「铜娃娃」可治！》等科普强调 Wilson 病为少数可治疗的遗传代谢病之一，早期规范治疗下约 80% 患儿可获得正常寿命，有助于提升公众认知。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="research-month" aria-labelledby="research-m2025-08">
+                    <h2 id="research-m2025-08" class="research-month__label">2025年8月</h2>
+                    <div class="research-month__cards">
+                        <article class="research-card">
+                            <h3 class="research-card__title">铜死亡（Cuproptosis）机制研究</h3>
+                            <p class="research-card__text">8 月 5 日，《中国实验方剂学杂志》纸质版刊登铜死亡相关基因在 WD 中作用的生物信息学分析与验证，提示铜死亡在 WD 病理生理中的关键角色，为新疗法提供潜在靶点。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="research-month" aria-labelledby="research-m2025-07">
+                    <h2 id="research-m2025-07" class="research-month__label">2025年7月</h2>
+                    <div class="research-month__cards">
+                        <article class="research-card">
+                            <h3 class="research-card__title">综述与铜死亡机制确认</h3>
+                            <p class="research-card__text"><strong>7 月 20 日</strong>，《中华肝脏病杂志》综述系统总结 WD 最新进展，涵盖临床特征、诊断优化、新型驱铜疗法与基因治疗前景。</p>
+                            <p class="research-card__text"><strong>7 月 1 日</strong>，另有研究进一步确认铜死亡机制在 WD 病理生理中的关键作用。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="research-month" aria-labelledby="research-m2025-06">
+                    <h2 id="research-m2025-06" class="research-month__label">2025年6月</h2>
+                    <div class="research-month__cards">
+                        <article class="research-card">
+                            <h3 class="research-card__title">肾脏损害专家共识与超声定量技术</h3>
+                            <p class="research-card__text">6 月 11 日，《中国肝豆状核变性肾脏损害中西医结合管理专家共识》发布。同日有研究探讨超声衰减系数、剪切波弹性成像等无创定量技术在评估 WD 患者肝脏储备功能中的应用，为无创监测肝损伤提供工具参考。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="research-month" aria-labelledby="research-m2025-05">
+                    <h2 id="research-m2025-05" class="research-month__label">2025年5月</h2>
+                    <div class="research-month__cards">
+                        <article class="research-card">
+                            <h3 class="research-card__title">「由靶及态」中西医结合诊疗模式</h3>
+                            <p class="research-card__text">5 月 16 日，《中国中西医结合杂志》提出基于 WD 明确 ATP7B 缺陷，从「打靶」治疗结合中医整体「调态」的协同框架，为中西医协同治疗 WD 提供理论参考。</p>
+                        </article>
+                        <article class="research-card">
+                            <h3 class="research-card__title">新版 EASL-ERN 临床实践指南</h3>
+                            <p class="research-card__text">5 月 25 日，欧洲肝病学会与欧洲罕见肝病网络发布 2025 版指南：强化诊断流程与 Leipzig 评分核心地位；将相对可交换铜（REC）列为关键诊断指标（界值 &gt;18.5%）；新增神经精神症状药物管理建议，并讨论儿童向成人医疗过渡。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="research-month" aria-labelledby="research-m2025-04">
+                    <h2 id="research-m2025-04" class="research-month__label">2025年4月</h2>
+                    <div class="research-month__cards">
+                        <article class="research-card">
+                            <h3 class="research-card__title">EASL / ERN 临床实践指南</h3>
+                            <p class="research-card__text">欧洲肝病学会与欧洲罕见病网络联合发布最新临床实践指南，为诊断、治疗与长期管理提供国际共识框架。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="research-month" aria-labelledby="research-m2025-02">
+                    <h2 id="research-m2025-02" class="research-month__label">2025年2月</h2>
+                    <div class="research-month__cards">
+                        <article class="research-card">
+                            <h3 class="research-card__title">GC310 基因疗法获批临床试验</h3>
+                            <p class="research-card__text">2 月 6 日，锦篮基因 GC310 腺相关病毒注射液获国家药监局临床试验默示许可，适应症为肝豆状核变性；拟通过单次治疗在靶组织表达功能性 miniATP7B，长期恢复铜代谢能力。</p>
+                        </article>
+                        <article class="research-card">
+                            <h3 class="research-card__title">剪切波弹性成像（SWE）与脾功能亢进预测</h3>
+                            <p class="research-card__text">2 月 18 日，有研究探讨 SWE 对 WD 患者发生脾功能亢进的预测价值，为并发症监测提供无创影像学思路。</p>
+                        </article>
+                    </div>
+                </section>
+
+            </div>
+
+            <div class="research-special">
+                <section class="research-special__block" aria-labelledby="research-epi">
+                    <h2 id="research-epi" class="research-special__title">流行病学数据更新</h2>
+                    <div class="research-special__body">
+                        <p>综合 2025 年至 2026 年初多项研究，我国 Wilson 病患病率约为 <strong>5.87/100 000</strong>（约 1/17 000）；ATP7B 变异携带频率约 <strong>1/90</strong>，有研究推算实际发病率或在 <strong>1/7 194</strong> 左右。<strong>p.Arg778Leu</strong> 为中国人热点突变之一。覆盖北京地区约 1400 万自然人群的研究亦提示，我国 Wilson 病患病率高于全球许多地区。</p>
+                        <p>2026 年 1 月 13 日，《Orphanet Journal of Rare Diseases》系统综述从全球层面归纳 Wilson 病疾病负担，指出南欧与亚洲部分地区患病率相对更高。</p>
+                    </div>
+                </section>
+                <section class="research-special__block" aria-labelledby="research-other">
+                    <h2 id="research-other" class="research-special__title">其他持续进展</h2>
+                    <ul class="research-special__list">
+                        <li><strong>影像学</strong>：2025–2026 年多篇工作展示 3.0 T MRI 等在区分神经型与肝型脑损伤中的价值，以及静息态 fMRI 等在认知与脑智发育机制探索中的应用。</li>
+                        <li><strong>干细胞与类器官</strong>：国家自然科学基金资助「人胚胎干细胞来源肝样细胞构建肝脏类器官治疗肝豆状核变性」等方向，体现细胞治疗领域的前瞻探索。</li>
+                    </ul>
+                </section>
+            </div>
+        </section>
+
+        <!-- 支持我们（原会员中心 + 捐赠与感谢） -->
+        <section id="member" class="page">
+            <div class="member-header">
+                <h1>支持我们</h1>
+                <p class="member-subtitle">选择您的身份、参与捐赠，并查看致谢名单</p>
+            </div>
+            
+            <div class="member-roles">
+                <div class="role-card" data-role="patient">
+                    <div class="role-icon site-visual site-visual--round" data-site-image="rolePatient">
+                        <img src="" alt="" width="80" height="80" loading="lazy">
+                    </div>
+                    <h2>患者/家属</h2>
+                    <p>作为患者或家属，您的支持帮助我们更好地为患者群体服务</p>
+                    <button class="role-btn">了解详情</button>
+                </div>
+                
+                <div class="role-card" data-role="doctor">
+                    <div class="role-icon site-visual site-visual--round" data-site-image="roleDoctor">
+                        <img src="" alt="" width="80" height="80" loading="lazy">
+                    </div>
+                    <h2>医生</h2>
+                    <p>医疗专业人士的支持推动医学研究和临床实践的发展</p>
+                    <button class="role-btn">了解详情</button>
+                </div>
+                
+                <div class="role-card" data-role="researcher">
+                    <div class="role-icon site-visual site-visual--round" data-site-image="roleResearcher">
+                        <img src="" alt="" width="80" height="80" loading="lazy">
+                    </div>
+                    <h2>研究者</h2>
+                    <p>研究人员的参与促进科学知识的积累和突破</p>
+                    <button class="role-btn">了解详情</button>
+                </div>
+                
+                <div class="role-card" data-role="company">
+                    <div class="role-icon site-visual site-visual--round" data-site-image="roleCompany">
+                        <img src="" alt="" width="80" height="80" loading="lazy">
+                    </div>
+                    <h2>企业（药企/器械）</h2>
+                    <p>企业的支持推动新药研发和医疗技术的进步</p>
+                    <button class="role-btn">了解详情</button>
+                </div>
+            </div>
+            
+            <!-- 角色详情弹窗 -->
+            <div id="roleModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <div id="roleDetails"></div>
+                </div>
+            </div>
+            
+            <!-- 捐赠信息板块 -->
+            <div class="member-donate-section">
+                <div class="donate-header">
+                    <div class="donate-message">
+                        <h1>为什么给我们捐钱</h1>
+                        <p class="donate-subtitle">（心灵鸡汤）</p>
+                        <div class="donate-text">
+                            <p>您的每一份捐赠都是对肝豆状核变性患者群体的关爱与支持。</p>
+                            <p>这些善款将用于：</p>
+                            <ul>
+                                <li>支持患者和家属的医疗费用</li>
+                                <li>推动医学研究和新药开发</li>
+                                <li>开展疾病宣传和教育活动</li>
+                                <li>建立患者支持网络和社群</li>
+                                <li>提供心理支持和咨询服务</li>
+                            </ul>
+                            <p>您的善举将点亮希望之光，帮助更多患者重获健康与希望。</p>
+                        </div>
+                    </div>
+                    <div class="donate-qr">
+                        <h3>捐钱二维码</h3>
+                        <div class="qr-placeholder qr-clickable" id="qrTrigger">
+                            <img src="f6e6f21e2455a7be1ffbd036a5e3886f.jpg" alt="捐款二维码" class="qr-image" data-site-image="qrDonation">
+                            <div class="qr-hint">点击查看大图</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 全屏二维码弹窗 -->
+                    <div id="qrModal" class="qr-modal">
+                        <div class="qr-modal-content">
+                            <span class="qr-close" id="qrClose">&times;</span>
+                            <div class="qr-modal-title">捐钱二维码</div>
+                            <div class="qr-modal-image">
+                                <img src="f6e6f21e2455a7be1ffbd036a5e3886f.jpg" alt="捐款二维码" class="qr-image-fullscreen" data-site-image="qrDonation">
+                            </div>
+                            <p class="qr-modal-hint">请使用微信扫描二维码进行捐赠</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-info">
+                    <h3>联系方式</h3>
+                    <p>如有任何疑问，请通过以下方式联系我们：</p>
+                    <p>邮箱：3781249996@qq.com</p>
+                    <p>电话：13263135011</p>
+                </div>
+            </div>
+
+            <div class="donors-section member-donors-merged">
+                <div class="donors-title-box">
+                    <h2>历史上捐过钱的</h2>
+                    <h2>人</h2>
+                </div>
+                <div class="donors-decorative site-visual" data-site-image="donorsDecorative">
+                    <img src="" alt="" width="300" height="200" loading="lazy">
+                </div>
+            </div>
+            
+            <div class="donors-list" id="donorsList">
+                <!-- 捐赠者列表将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="thanks-section">
+                <h2>感谢词</h2>
+                <p class="thanks-text">
+                    在此，我们衷心感谢所有为肝豆状核变性研究和患者支持事业做出贡献的爱心人士。
+                    您的慷慨捐赠和无私支持，为无数患者和家庭带来了希望与温暖。
+                    每一份善举都如星光般闪耀，汇聚成照亮前路的明灯。
+                    感谢您与我们同行，共同为改善患者生活质量而努力！
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- 管理员登录弹窗 -->
+    <div id="adminLoginModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close" id="adminLoginClose">&times;</span>
+            <h2>管理员登录</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminUsername">账号：</label>
+                    <input type="text" id="adminUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">密码：</label>
+                    <input type="password" id="adminPassword" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">登录</button>
+                    <button type="button" class="btn-secondary" id="cancelLogin">取消</button>
+                </div>
+                <div id="loginError" class="error-message" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 管理员后台页面 -->
+    <section id="admin" class="page">
+        <div class="admin-header">
+            <h1>管理员后台</h1>
+            <div class="admin-header-actions">
+                <button class="btn-primary" id="editModeBtn">编辑模式</button>
+                <button class="btn-secondary" id="adminLogout">退出登录</button>
+            </div>
+        </div>
+        
+        <div class="admin-tabs">
+            <button class="admin-tab active" data-tab="news">新闻管理</button>
+            <button class="admin-tab" data-tab="content">内容管理</button>
+            <button class="admin-tab" data-tab="history" id="historyTab" style="display: none;">历史记录</button>
+            <button class="admin-tab" data-tab="chat" id="chatTab">对话窗口</button>
+        </div>
+
+        <!-- 新闻管理标签页 -->
+        <div id="adminNewsTab" class="admin-tab-content active">
+            <div class="admin-section-header">
+                <h2>新闻列表</h2>
+                <button class="btn-primary" id="addNewsBtn">添加新闻</button>
+            </div>
+            <div id="newsList" class="admin-list">
+                <!-- 新闻列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 内容管理标签页 -->
+        <div id="adminContentTab" class="admin-tab-content">
+            <div class="admin-section-header">
+                <h2>板块内容管理</h2>
+            </div>
+            <div class="content-sections">
+                <div class="content-section-card">
+                    <h3>简介页面</h3>
+                    <button class="btn-primary edit-content-btn" data-section="intro">编辑内容</button>
+                </div>
+                <div class="content-section-card">
+                    <h3>医学研究</h3>
+                    <button class="btn-primary edit-content-btn" data-section="research">编辑内容</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 历史记录标签页（仅超级管理员可见） -->
+        <div id="adminHistoryTab" class="admin-tab-content">
+            <div class="admin-section-header">
+                <h2>修改历史记录</h2>
+                <p style="color: var(--text-secondary); font-size: 14px;">查看所有修改记录，可以否定某项修改</p>
+            </div>
+            <div id="historyList" class="history-list">
+                <!-- 历史记录列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 对话窗口标签页 -->
+        <div id="adminChatTab" class="admin-tab-content">
+            <div class="admin-section-header">
+                <h2>管理员对话</h2>
+            </div>
+            <div class="chat-container">
+                <div id="chatMessages" class="chat-messages">
+                    <!-- 消息将通过JavaScript动态生成 -->
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="输入消息..." class="chat-input">
+                    <button id="sendChatBtn" class="btn-primary">发送</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加/编辑新闻弹窗 -->
+        <div id="newsModal" class="admin-modal">
+            <div class="admin-modal-content large">
+                <span class="admin-close" id="newsModalClose">&times;</span>
+                <h2 id="newsModalTitle">添加新闻</h2>
+                <form id="newsForm">
+                    <input type="hidden" id="newsId">
+                    <div class="form-group">
+                        <label for="newsTitle">标题：</label>
+                        <input type="text" id="newsTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newsDescription">简介：</label>
+                        <textarea id="newsDescription" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="newsDate">日期：</label>
+                        <input type="date" id="newsDate" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">保存</button>
+                        <button type="button" class="btn-secondary" id="cancelNews">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 编辑内容弹窗 -->
+        <div id="contentModal" class="admin-modal">
+            <div class="admin-modal-content large">
+                <span class="admin-close" id="contentModalClose">&times;</span>
+                <h2 id="contentModalTitle">编辑内容</h2>
+                <form id="contentForm">
+                    <input type="hidden" id="contentSection">
+                    <div class="form-group">
+                        <label for="contentTitle">标题：</label>
+                        <input type="text" id="contentTitle">
+                    </div>
+                    <div class="form-group">
+                        <label for="contentText">内容：</label>
+                        <textarea id="contentText" rows="10"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">保存</button>
+                        <button type="button" class="btn-secondary" id="cancelContent">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- 管理员入口按钮（右下角） -->
+    <div class="admin-entry" id="adminEntry">
+        <button class="admin-entry-btn" title="管理员入口">⚙</button>
+    </div>
+
+    <!-- 全站默认图片配置（见 site-images.js 内 SITE_DEFAULT_IMAGES） -->
+    <div id="siteImageActionModal" class="admin-modal">
+        <div class="admin-modal-content small">
+            <span class="admin-close" id="siteImageActionClose">&times;</span>
+            <h3>图片操作</h3>
+            <p id="siteImageActionHint" class="site-image-action-hint"></p>
+            <div class="form-actions site-image-action-btns">
+                <button type="button" class="btn-primary" id="siteImageReplaceBtn">选择新图片</button>
+                <button type="button" class="btn-secondary" id="siteImageCropBtn">裁剪当前图</button>
+                <button type="button" class="btn-secondary" id="siteImageRestoreBtn">恢复默认</button>
+                <button type="button" class="btn-secondary" id="siteImageCancelBtn">取消</button>
+            </div>
+            <input type="file" id="siteImageFileInput" accept="image/*" style="display:none">
+        </div>
+    </div>
+    <div id="siteImageCropModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close" id="siteImageCropClose">&times;</span>
+            <h3>裁剪图片</h3>
+            <p class="site-image-crop-hint">在图片上按下拖动，框选要保留的区域后点击「应用裁剪」。</p>
+            <div class="site-image-crop-wrap">
+                <canvas id="siteImageCropCanvas"></canvas>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-primary" id="siteImageCropApply">应用裁剪</button>
+                <button type="button" class="btn-secondary" id="siteImageCropCancel">返回</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新闻详情弹窗 -->
+    <div id="newsDetailModal" class="news-detail-modal" role="dialog" aria-modal="true" aria-labelledby="newsDetailTitle" aria-hidden="true">
+        <div class="news-detail-modal-content">
+            <button type="button" class="news-detail-close" id="newsDetailClose" aria-label="关闭">&times;</button>
+            <img id="newsDetailImage" class="news-detail-image" src="" alt="">
+            <h2 id="newsDetailTitle" class="news-detail-title"></h2>
+            <p id="newsDetailDate" class="news-detail-date"></p>
+            <div id="newsDetailBody" class="news-detail-body"></div>
+        </div>
+    </div>
+
+    <!-- 站内嵌原文（iframe；部分站点因安全策略无法嵌入，请用「新窗口打开」） -->
+    <div id="articleEmbedModal" class="article-embed-modal" role="dialog" aria-modal="true" aria-labelledby="articleEmbedTitle" aria-hidden="true">
+        <div class="article-embed-shell">
+            <header class="article-embed-toolbar">
+                <div class="article-embed-toolbar-left">
+                    <h2 id="articleEmbedTitle" class="article-embed-title">原文浏览</h2>
+                    <p class="article-embed-hint">以下内容在站内打开。若出现空白，多为对方网站禁止嵌入，请点击「新窗口打开」。</p>
+                </div>
+                <div class="article-embed-toolbar-actions">
+                    <a id="articleEmbedOpenBlank" class="article-embed-btn article-embed-btn--secondary" href="#" target="_blank" rel="noopener noreferrer">新窗口打开</a>
+                    <button type="button" class="article-embed-btn article-embed-btn--primary" id="articleEmbedClose">关闭</button>
+                </div>
+            </header>
+            <iframe id="articleEmbedFrame" class="article-embed-frame" title="原文页面"></iframe>
+        </div>
+    </div>
+
+    <script src="site-images.js"></script>
+    <script src="script.js"></script>
+    <script src="admin.js"></script>
+    <script src="editor.js"></script>
+</body>
+</html>
+

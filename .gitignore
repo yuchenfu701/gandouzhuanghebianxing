@@ -1,0 +1,16 @@
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+.idea/
+.vscode/
+*.log
+
+# 本地大文件 / 非站点资源（如需纳入版本库可删除下列规则）
+*.docx
+*.doc
+
+# 可选：不将本地上传的超大素材纳入 Git 时取消注释
+# hero-home.png
