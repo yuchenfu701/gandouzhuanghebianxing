@@ -2085,6 +2085,100 @@ body.admin-image-pick-mode #mainContent .site-visual:hover {
    管理员相关样式
    ============================================ */
 
+/* 左下角 AI 助手（Coze） */
+.ai-assistant-fab {
+    position: fixed;
+    left: 20px;
+    bottom: 24px;
+    z-index: 1400;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    background: linear-gradient(145deg, #e8f5e9 0%, #a5d6a7 100%);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-assistant-fab:hover {
+    transform: scale(1.06);
+    box-shadow: var(--shadow-lg);
+}
+
+.ai-assistant-fab:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.ai-assistant-fab-icon {
+    display: block;
+    pointer-events: none;
+}
+
+.ai-assistant-modal {
+    display: none;
+    position: fixed;
+    z-index: 3050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-assistant-modal.active {
+    display: flex;
+}
+
+.ai-assistant-modal-content {
+    background: var(--card-bg);
+    padding: 28px 32px;
+    border-radius: var(--radius);
+    width: 90%;
+    max-width: 420px;
+    box-shadow: var(--shadow-lg);
+    animation: scaleIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-assistant-modal-content h3 {
+    margin: 0 0 12px;
+    font-size: 1.25rem;
+    color: var(--primary-dark);
+    font-weight: 600;
+}
+
+.ai-assistant-modal-hint {
+    margin: 0 0 24px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.ai-assistant-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+    .ai-assistant-fab {
+        left: 14px;
+        bottom: 18px;
+        width: 44px;
+        height: 44px;
+    }
+}
+
 /* 管理员入口按钮 */
 .admin-entry {
     position: fixed;

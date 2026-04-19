@@ -977,6 +977,33 @@
         </div>
     </div>
 
+    <!-- 左下角 AI 助手（Coze WebChat SDK） -->
+    <button type="button" id="aiAssistantFab" class="ai-assistant-fab" aria-label="AI 智能助手" title="AI 智能助手">
+        <svg class="ai-assistant-fab-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="aiFabGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#e8f5e9"/>
+                    <stop offset="100%" style="stop-color:#c8e6c9"/>
+                </linearGradient>
+            </defs>
+            <circle cx="12" cy="12" r="11" fill="url(#aiFabGrad)" stroke="var(--primary-dark)" stroke-width="1"/>
+            <path d="M12 6v2M12 16v2M6 12h2M16 12h2" stroke="var(--primary-dark)" stroke-width="1.2" stroke-linecap="round"/>
+            <circle cx="9" cy="9" r="1.2" fill="var(--primary-dark)"/>
+            <circle cx="15" cy="9" r="1.2" fill="var(--primary-dark)"/>
+            <path d="M8.5 14c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8" fill="none" stroke="var(--primary-dark)" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+    </button>
+    <div id="aiAssistantConfirmModal" class="ai-assistant-modal" role="dialog" aria-modal="true" aria-labelledby="aiAssistantConfirmTitle" aria-hidden="true">
+        <div class="ai-assistant-modal-content">
+            <h3 id="aiAssistantConfirmTitle">是否进入 AI 智能体对话？</h3>
+            <p class="ai-assistant-modal-hint">将使用智能助手为您解答（由 Coze 提供对话界面）。</p>
+            <div class="ai-assistant-modal-actions">
+                <button type="button" id="aiAssistantConfirmYes" class="btn-primary">是</button>
+                <button type="button" id="aiAssistantConfirmNo" class="btn-secondary">否</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="sync-public-config.js"></script>
@@ -985,6 +1012,7 @@
     <script src="script.js"></script>
     <script src="admin.js"></script>
     <script src="editor.js"></script>
+    <script src="coze-chat.js"></script>
 </body>
 </html>
 
